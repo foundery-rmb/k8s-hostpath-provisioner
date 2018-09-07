@@ -20,10 +20,12 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"strconv"
 	"strings"
@@ -73,6 +75,13 @@ func NewHostPathProvisioner(client kubernetes.Interface, id string) controller.P
 
 var _ controller.Provisioner = &hostPathProvisioner{}
 
+func mkdirAll(path string) error {
+	cmd := exec.Command("mkdir", "-p", path)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	return cmd.Run()
+}
+
 /*
  * Provision: create the physical on-disk path for this PV and return a new
  * volume referencing it as a hostPath.  The volume is annotated with our
@@ -101,7 +110,11 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 
 	/* Create the on-disk directory. */
 	path := path.Join(params.pvDir, options.PVName)
-	if err := os.MkdirAll(path, 0777); err != nil {
+	/*if err := os.MkdirAll(path, 0777); err != nil {
+		glog.Errorf("failed to mkdir %s: %s", path, err)
+		return nil, err
+	}*/
+	if err := mkdirAll(path); err != nil {
 		glog.Errorf("failed to mkdir %s: %s", path, err)
 		return nil, err
 	}
@@ -116,6 +129,7 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 		glog.Errorf("path is not a directory: %s", path)
 		return nil, err
 	}
+	glog.Infof("path is detected as a directory: %s", path)
 
 	/* Set CephFS quota, if enabled */
 	if params.cephFSQuota {
