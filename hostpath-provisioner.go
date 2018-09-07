@@ -20,7 +20,6 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -76,10 +75,7 @@ func NewHostPathProvisioner(client kubernetes.Interface, id string) controller.P
 var _ controller.Provisioner = &hostPathProvisioner{}
 
 func mkdirAll(path string) error {
-	cmd := exec.Command("mkdir", "-p", path)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	return cmd.Run()
+	return exec.Command("mkdir", "-p", path).Run()
 }
 
 /*
@@ -118,6 +114,7 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 		glog.Errorf("failed to mkdir %s: %s", path, err)
 		return nil, err
 	}
+	glog.Infof("mkdirAll() appears to have succeeded: %s", path)
 
 	/* Ensure that the folder actually exists */
 	file_info, err := os.Stat(path)
