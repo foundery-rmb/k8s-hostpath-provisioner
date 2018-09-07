@@ -16,7 +16,7 @@
 # limitations under the License.
 
 REPOSITORY	?= foundery.azurecr.io/k8s-hostpath-provisioner
-TAG		?= latest
+TAG		?= $(shell git describe --tags --abbrev=0)
 IMAGE		= ${REPOSITORY}:${TAG}
 
 image: hostpath-provisioner
