@@ -1,3 +1,5 @@
 *.sw?
 /hostpath-provisioner
+/vendor/*
+!/vendor/vendor.json
 
