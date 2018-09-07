@@ -2,6 +2,7 @@
  *
  * Copyright 2016 The Kubernetes Authors.
  * Copyright 2017 Torchbox Ltd.
+ * Copyright 2018 FOUNDeRY, Rand Merchant Bank.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +103,17 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 	path := path.Join(params.pvDir, options.PVName)
 	if err := os.MkdirAll(path, 0777); err != nil {
 		glog.Errorf("failed to mkdir %s: %s", path, err)
+		return nil, err
+	}
+
+	/* Ensure that the folder actually exists */
+	file_info, err := os.Stat(path)
+	if err != nil {
+		glog.Errorf("failed to stat path: %s", path)
+		return nil, err
+	}
+	if !file_info.IsDir() {
+		glog.Errorf("path is not a directory: %s", path)
 		return nil, err
 	}
 
