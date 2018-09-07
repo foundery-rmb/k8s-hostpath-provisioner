@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-REPOSITORY	?= torchbox/k8s-hostpath-provisioner
+REPOSITORY	?= foundery.azurecr.io/k8s-hostpath-provisioner
 TAG		?= latest
 IMAGE		= ${REPOSITORY}:${TAG}
 
