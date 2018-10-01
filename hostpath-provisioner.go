@@ -106,11 +106,7 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 
 	/* Create the on-disk directory. */
 	path := path.Join(params.pvDir, options.PVName)
-	/*if err := os.MkdirAll(path, 0777); err != nil {
-		glog.Errorf("failed to mkdir %s: %s", path, err)
-		return nil, err
-	}*/
-	if err := mkdirAll(path); err != nil {
+	if err := os.MkdirAll(path, 0777); err != nil {
 		glog.Errorf("failed to mkdir %s: %s", path, err)
 		return nil, err
 	}
