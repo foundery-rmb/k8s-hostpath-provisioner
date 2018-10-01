@@ -112,6 +112,13 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 	}
 	glog.Infof("mkdirAll() appears to have succeeded: %s", path)
 
+	/* Force folder permissions to 0777. */
+	if err := os.Chmod(path, 0777); err != nil {
+		glog.Errorf("failed to chmod %s: %s", path, err)
+		return nil, err
+	}
+	glog.Infof("os.Chmod() appears to have succeeded: %s", path)
+
 	/* Ensure that the folder actually exists */
 	file_info, err := os.Stat(path)
 	if err != nil {
@@ -123,6 +130,7 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 		return nil, err
 	}
 	glog.Infof("path is detected as a directory: %s", path)
+	glog.Infof("path has permissions: %o", file_info.Mode())
 
 	/* Set CephFS quota, if enabled */
 	if params.cephFSQuota {
